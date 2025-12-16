@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ma/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  categories    Category[]
+  transactions  Transaction[]
+  transfers     Transfer[]
+  preferences   UserPreferences?
+  currencies    Currency[]
+
+  @@map("users")
+}
+
+model UserPreferences {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  baseCurrency    String   @default("USD")
+  hiddenCurrencies String?  // JSON array of currency codes to hide (e.g., ["CNY", "JPY"])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model Category {
+  id          String       @id @default(cuid())
+  userId      String
+  name        String
+  bucket      BucketType
+  type        CategoryType
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId, bucket])
+  @@map("categories")
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  userId      String
+  categoryId  String
+  bucket      BucketType
+  type        TransactionType
+  amountCents Int             // Amount in minor units (cents)
+  currency    String          // ISO currency code (USD, EUR, etc.)
+  description String?
+  date        DateTime        @default(now())
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([userId, bucket])
+  @@index([userId, date])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+model Transfer {
+  id              String     @id @default(cuid())
+  userId          String
+  bucket          BucketType
+  fromCurrency    String     // ISO currency code
+  toCurrency      String     // ISO currency code
+  fromAmountCents Int        // Amount in minor units (cents)
+  toAmountCents   Int        // Amount in minor units (cents)
+  exchangeRate    Float      // Manual exchange rate
+  description     String?
+  date            DateTime   @default(now())
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relations
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, bucket])
+  @@index([userId, date])
+  @@map("transfers")
+}
+
+enum BucketType {
+  obligations
+  investments
+  personal
+}
+
+enum CategoryType {
+  income
+  expense
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+model Currency {
+  id          String   @id @default(cuid())
+  userId      String
+  code        String   // ISO currency code (USD, EUR, etc.)
+  name        String   // Display name (US Dollar, Euro, etc.)
+  symbol      String   // Currency symbol ($, €, £, etc.)
+  isDefault   Boolean  @default(false) // True for system defaults
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, code])
+  @@index([userId])
+  @@map("currencies")
+}
