@@ -112,11 +112,11 @@ export function TransferForm({ onSubmit, onCancel }: TransferFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="bucket">Bucket</Label>
+        <Label htmlFor="bucket" className="text-sm sm:text-base">Bucket</Label>
         <Select value={bucket} onValueChange={(value) => setBucket(value as BucketName)}>
-          <SelectTrigger id="bucket">
+          <SelectTrigger id="bucket" className="text-sm sm:text-base">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -125,14 +125,14 @@ export function TransferForm({ onSubmit, onCancel }: TransferFormProps) {
             <SelectItem value="personal">Personal</SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs text-muted-foreground">Transfers happen within the same bucket</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">Transfers happen within the same bucket</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
-          <Label htmlFor="fromCurrency">From Currency</Label>
+          <Label htmlFor="fromCurrency" className="text-sm sm:text-base">From Currency</Label>
           <Select value={fromCurrency} onValueChange={setFromCurrency}>
-            <SelectTrigger id="fromCurrency">
+            <SelectTrigger id="fromCurrency" className="text-sm sm:text-base">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -146,9 +146,9 @@ export function TransferForm({ onSubmit, onCancel }: TransferFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="toCurrency">To Currency</Label>
+          <Label htmlFor="toCurrency" className="text-sm sm:text-base">To Currency</Label>
           <Select value={toCurrency} onValueChange={setToCurrency}>
-            <SelectTrigger id="toCurrency">
+            <SelectTrigger id="toCurrency" className="text-sm sm:text-base">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -163,7 +163,7 @@ export function TransferForm({ onSubmit, onCancel }: TransferFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="fromAmount">From Amount</Label>
+        <Label htmlFor="fromAmount" className="text-sm sm:text-base">From Amount</Label>
         <Input
           id="fromAmount"
           type="number"
@@ -173,11 +173,12 @@ export function TransferForm({ onSubmit, onCancel }: TransferFormProps) {
           onChange={(e) => setFromAmount(e.target.value)}
           placeholder="0.00"
           required
+          className="text-sm sm:text-base"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="manualRate">Exchange Rate</Label>
+        <Label htmlFor="manualRate" className="text-sm sm:text-base">Exchange Rate</Label>
         <Input
           id="manualRate"
           type="number"
@@ -187,46 +188,66 @@ export function TransferForm({ onSubmit, onCancel }: TransferFormProps) {
           onChange={(e) => setManualRate(e.target.value)}
           placeholder="e.g., 0.92 for USD to EUR"
           required
+          className="text-sm sm:text-base"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           How much 1 {fromCurrency} equals in {toCurrency}
         </p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="toAmount">To Amount (calculated)</Label>
-        <Input id="toAmount" type="number" step="0.01" value={toAmount} readOnly className="bg-muted" />
+        <Label htmlFor="toAmount" className="text-sm sm:text-base">To Amount (calculated)</Label>
+        <Input 
+          id="toAmount" 
+          type="number" 
+          step="0.01" 
+          value={toAmount} 
+          readOnly 
+          className="bg-muted text-sm sm:text-base" 
+        />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="effectiveAt">Effective Date</Label>
+        <Label htmlFor="effectiveAt" className="text-sm sm:text-base">Effective Date</Label>
         <Input
           id="effectiveAt"
           type="datetime-local"
           value={effectiveAt}
           onChange={(e) => setEffectiveAt(e.target.value)}
           required
+          className="text-sm sm:text-base"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="note">Note (optional)</Label>
+        <Label htmlFor="note" className="text-sm sm:text-base">Note (optional)</Label>
         <Textarea
           id="note"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Add a note about this transfer"
           rows={2}
+          className="text-sm sm:text-base resize-none"
         />
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && <p className="text-xs sm:text-sm text-destructive">{error}</p>}
 
-      <div className="flex gap-3 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
+      <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 justify-end pt-2">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onCancel} 
+          disabled={loading}
+          className="w-full sm:w-auto text-sm sm:text-base"
+        >
           Cancel
         </Button>
-        <Button type="submit" disabled={loading}>
+        <Button 
+          type="submit" 
+          disabled={loading}
+          className="w-full sm:w-auto text-sm sm:text-base"
+        >
           {loading ? "Creating..." : "Create Transfer"}
         </Button>
       </div>
